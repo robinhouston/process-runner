@@ -20,7 +20,7 @@ import runner
 
 # Handle command-line options
 parser = optparse.OptionParser(usage="%prog [options]")
-parser.add_option("-s", "--socket_path",
+parser.add_option("-s", "--socket-path",
                 action="store",
                 default="/tmp/.runner-sock",
                 help="socket path")
