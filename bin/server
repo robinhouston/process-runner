@@ -1,0 +1,39 @@
+#!/usr/bin/python
+
+
+# Standard modules
+import logging
+import optparse
+import os
+import sys
+
+
+# Runner module
+RUNNER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+sys.path = [os.path.join(RUNNER_DIR, "lib")] + sys.path
+import runner
+
+
+##
+# Initialisation
+##
+
+# Handle command-line options
+parser = optparse.OptionParser(usage="%prog [options]")
+parser.add_option("-s", "--socket_path",
+                action="store",
+                default="/tmp/.runner-sock",
+                help="socket path")
+(options, args) = parser.parse_args()
+if args: parser.error("Unexpected argument: " + args[0])
+
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(levelname)s %(message)s"
+)
+
+
+server = runner.Server(options.socket_path)
+server.run()
