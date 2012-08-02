@@ -250,7 +250,13 @@ class Server(object):
                 elif fd in self.conns:
                     # Received data from one of our clients
                     logging.info("Data received on fd %d", fd.fileno())
-                    self.conns[fd].recv()
+                    try:
+                        self.conns[fd].recv()
+                    except socket.error, e:
+                        if e.errno == errno.EPIPE:
+                            pass # Client cut us off. That’s okay.
+                        else:
+                            raise
                 
                 elif fd == self.child_pipe_r:
                     # Received output from the active child
