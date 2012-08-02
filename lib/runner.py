@@ -238,6 +238,7 @@ class Server(object):
                         # Still data to read from the child. Don’t stop yet.
                         continue
                     
+                    logging.info("Process %s terminates", self.uuid)
                     os.read(self.wakeup_r, 1) # Read the null byte
                     self.reap_child()
                 
@@ -249,7 +250,7 @@ class Server(object):
                 
                 elif fd in self.conns:
                     # Received data from one of our clients
-                    logging.info("Data received on fd %d", fd.fileno())
+                    logging.info("Command received on fd %d", fd.fileno())
                     try:
                         self.conns[fd].recv()
                     except socket.error, e:
@@ -260,6 +261,7 @@ class Server(object):
                 
                 elif fd == self.child_pipe_r:
                     # Received output from the active child
+                    logging.debug("Data received from running process")
                     self.output[self.uuid] += os.read(self.child_pipe_r, 4096)
                 
                 else:
