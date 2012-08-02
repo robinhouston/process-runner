@@ -262,7 +262,11 @@ class Server(object):
                 elif fd == self.child_pipe_r:
                     # Received output from the active child
                     logging.debug("Data received from running process")
-                    self.output[self.uuid] += os.read(self.child_pipe_r, 4096)
+                    data = os.read(self.child_pipe_r, 4096)
+                    if self.uuid is None:
+                        logging.warn("Discarding output from ended process: %s", data)
+                    else:
+                        self.output[self.uuid] += data
                 
                 else:
                     logging.warn("Unexpected file descriptor from select: %r", fd)
