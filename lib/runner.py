@@ -195,6 +195,9 @@ class Server(object):
             return True
         
         # In the child process
+        
+        os.setpgrp() # Establish a new process group
+        
         out = self.child_pipe_w    # Keep the writer end of the child pipe;
         os.closerange(0, out)      # close every
         os.closerange(out+1, 1024) #            thing else.
@@ -209,7 +212,7 @@ class Server(object):
         os._exit(1)
     
     def kill_child(self):
-        os.kill(self.pid, signal.SIGTERM)
+        os.killpg(self.pid, signal.SIGTERM)
     
     def reap_child(self):
         pid, status = os.waitpid(self.pid, 0)
