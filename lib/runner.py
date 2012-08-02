@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 from collections import deque
 import datetime
 import errno
@@ -218,7 +220,7 @@ class Server(object):
     def run(self):
         # Event loop
         while True:
-            fds = [self.sock, self.wakeup_r, self.child_pipe_r] + self.conns.keys()
+            fds = [self.child_pipe_r, self.wakeup_r, self.sock] + self.conns.keys()
             try:
                 r, w, x = select.select(fds, [], fds)
             except select.error, e:
@@ -232,6 +234,10 @@ class Server(object):
             for fd in r:
                 if fd == self.wakeup_r:
                     # We must have had a SIGCHLD
+                    if self.child_pipe_r in r:
+                        # Still data to read from the child. Don’t stop yet.
+                        continue
+                    
                     os.read(self.wakeup_r, 1) # Read the null byte
                     self.reap_child()
                 
